@@ -162,6 +162,208 @@ st.markdown(
         .scenario-grid { grid-template-columns:1fr; }
         .audience-row, .pilot-row { grid-template-columns:108px minmax(0,1fr) 64px; gap:6px; }
       }
+      /* Рабочий штаб: контраст, движение и иерархия без внешних ассетов. */
+      html, body, [data-testid="stAppViewContainer"] { background:#f3f4f1; }
+      [data-testid="stAppViewContainer"] {
+        background-image:radial-gradient(circle at 5% 0%,rgba(247,210,54,.13),transparent 31%),
+          linear-gradient(90deg,rgba(34,37,40,.018) 1px,transparent 1px);
+        background-size:auto,32px 32px;
+      }
+      .block-container { max-width:1390px; padding-top:1.6rem; }
+      .hero { position:relative; overflow:hidden; background:#17191b; color:#f9faf8;
+        border:1px solid #2f3234; border-radius:25px; border-top:0;
+        padding:37px 40px 0; box-shadow:0 24px 55px rgba(25,28,30,.16); }
+      .hero:before { content:""; position:absolute; inset:0;
+        background:radial-gradient(circle at 82% 46%,rgba(245,208,43,.18),transparent 31%),
+          repeating-linear-gradient(90deg,transparent 0 65px,rgba(255,255,255,.025) 66px 67px);
+        pointer-events:none; }
+      .hero-grid { position:relative; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(295px,.88fr);
+        gap:25px; align-items:center; min-height:275px; }
+      .hero-copy { position:relative; z-index:2; padding-bottom:28px; }
+      .hero-meta { color:#f8d335; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; gap:10px; }
+      .brand-dot { width:17px; height:17px; background:#f8d335; box-shadow:inset -6px 0 #17191b;
+        border:1px solid rgba(255,255,255,.5); }
+      .hero-live { display:inline-flex; align-items:center; gap:7px; margin-left:12px;
+        padding:5px 9px; border:1px solid rgba(255,255,255,.18); border-radius:99px;
+        color:#e5e9e6; font-size:.68rem; letter-spacing:.02em; text-transform:none; }
+      .hero-live:before { content:""; width:6px; height:6px; background:#f7d334; border-radius:50%;
+        box-shadow:0 0 0 4px rgba(247,211,52,.14); }
+      .hero h1 { color:#fff; font-size:clamp(2rem,3.5vw,3.35rem); line-height:1.04;
+        letter-spacing:-.055em; margin:24px 0 13px; font-weight:800; }
+      .hero h1 span { color:#f8d335; }
+      .hero-sub { color:#f4f5f2; font-size:1rem; font-weight:650; }
+      .hero-desc { color:#b7bcb8; max-width:590px; font-size:.93rem; line-height:1.55; }
+      .hero-steps { display:flex; align-items:center; flex-wrap:wrap; gap:10px;
+        color:#c9cdc9; font-size:.69rem; font-weight:750; letter-spacing:.08em;
+        text-transform:uppercase; margin-top:23px; }
+      .hero-steps i { height:1px; width:23px; background:#7a806f; }
+      .hero-visual { position:relative; min-height:275px; display:grid; place-items:center; isolation:isolate; }
+      .hero-orbit { position:absolute; border:1px solid rgba(248,211,53,.28); border-radius:50%; }
+      .hero-orbit-outer { width:280px; height:280px; box-shadow:0 0 0 37px rgba(248,211,53,.025); }
+      .hero-orbit-inner { width:218px; height:218px; border-style:dashed; border-color:rgba(255,255,255,.23); }
+      .hero-visual:before,.hero-visual:after { content:""; position:absolute; width:10px; height:10px;
+        border-radius:50%; background:#f8d335; box-shadow:0 0 20px rgba(248,211,53,.8); }
+      .hero-visual:before { top:30px; right:57px; }
+      .hero-visual:after { bottom:45px; left:45px; width:6px; height:6px; }
+      .hero-pulse { position:absolute; width:166px; height:166px; border-radius:50%;
+        background:radial-gradient(circle at 34% 25%,#373628,#242622 54%,#191b1c 75%);
+        box-shadow:0 20px 55px rgba(0,0,0,.3), inset 0 0 0 1px rgba(248,211,53,.28); }
+      .hero-number { position:relative; z-index:1; text-align:center; display:flex;
+        flex-direction:column; align-items:center; max-width:285px; }
+      .hero-number-label { color:#f8d335; font-size:.62rem; letter-spacing:.1em;
+        font-weight:800; line-height:1.3; }
+      .hero-number strong { display:block; color:#fff; font-size:clamp(1.45rem,2.7vw,2.45rem);
+        letter-spacing:-.055em; margin:7px 0 4px; white-space:nowrap; }
+      .hero-number span { color:#b9bdb9; font-size:.68rem; }
+      .hero-footer { position:relative; display:flex; justify-content:space-between;
+        padding:13px 0 16px; border-top:1px solid rgba(255,255,255,.1);
+        color:#a6aba8; font-size:.7rem; letter-spacing:.05em; }
+      .hero-footer span:first-child { color:#f8d335; font-weight:780; letter-spacing:.13em; }
+      .metrics { gap:12px; margin:17px 0 17px; }
+      .metrics.result { grid-template-columns:repeat(4,minmax(0,1fr)); }
+      .metric { position:relative; overflow:hidden; min-height:115px; border:1px solid #e3e6e3;
+        padding:17px 19px; box-shadow:0 8px 28px rgba(23,27,28,.035); }
+      .metric:before { content:""; position:absolute; top:0; left:0; right:0;
+        height:3px; background:#f0d453; }
+      .metric-label { color:#687078; font-weight:600; }
+      .metric-value { font-size:clamp(1.35rem,2.2vw,1.9rem); letter-spacing:-.035em; }
+      .metric-help { color:#8a9194; }
+      .section-eyebrow { color:#9c7800; font-size:.69rem; letter-spacing:.14em; }
+      .timeline-step { position:relative; padding:13px 15px; border:1px solid #e4e7e4;
+        box-shadow:0 5px 16px rgba(25,28,29,.025); }
+      .timeline-index { color:#a17b00; letter-spacing:.12em; }
+      .timeline-step.done:before { content:"✓"; position:absolute; right:10px; top:9px;
+        width:19px; height:19px; border-radius:50%; display:grid; place-items:center;
+        background:#e7f1e7; color:#3e8051; font-size:.7rem; font-weight:800; }
+      .timeline-step.active { box-shadow:0 0 0 2px rgba(248,211,53,.2); }
+      .decision-flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:11px; margin:12px 0 19px; }
+      .flow-step { position:relative; min-height:103px; background:#1c1e20; color:#fff;
+        border:1px solid #313537; border-radius:15px; padding:14px 17px; }
+      .flow-step:last-child { background:#f8d335; border-color:#e4c12d; color:#202123; }
+      .flow-step:not(:last-child):after { content:"→"; position:absolute; right:-17px; top:35px;
+        z-index:2; color:#ad8d09; font-size:1.35rem; font-weight:800; }
+      .flow-label { color:#b4bbb7; font-size:.73rem; }
+      .flow-step:last-child .flow-label { color:#62500b; }
+      .flow-value { font-size:1.65rem; font-weight:800; letter-spacing:-.04em; margin-top:5px; }
+      .flow-note { font-size:.69rem; color:#9da49f; margin-top:1px; }
+      .flow-step:last-child .flow-note { color:#665614; }
+      .portfolio-board { display:grid; grid-template-columns:205px minmax(0,1fr);
+        gap:22px; align-items:center; padding:12px 5px; }
+      .budget-ring { width:175px; height:175px; border-radius:50%; display:grid; place-items:center;
+        margin:auto; box-shadow:0 12px 30px rgba(30,32,34,.12); }
+      .budget-ring-core { width:125px; height:125px; border-radius:50%; background:#fff;
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        box-shadow:inset 0 0 0 1px #eceeed; }
+      .budget-ring-core strong { font-size:2rem; line-height:1; letter-spacing:-.06em; }
+      .budget-ring-core span { color:#81888c; font-size:.7rem; margin-top:5px; }
+      .portfolio-board-title { color:#25292b; font-size:1.1rem; font-weight:770; margin-bottom:12px; }
+      .budget-breakdown { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+      .budget-part { border:1px solid #e9ebe9; border-radius:10px; padding:11px 12px; background:#fafbf9; }
+      .budget-part:before { content:""; display:inline-block; width:8px; height:8px;
+        border-radius:50%; background:var(--part-color); margin-right:7px; }
+      .budget-part-label { color:#667078; font-size:.75rem; }
+      .budget-part-value { color:#292c2e; font-size:1.05rem; font-weight:760; margin-top:4px; }
+      .portfolio-contacts { margin-top:16px; }
+      .portfolio-contacts .bar-shell { height:9px; }
+      .portfolio-contacts .bar-meta { margin-top:7px; }
+      .campaign-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; margin:15px 0 18px; }
+      .campaign-card { background:#fff; border:1px solid #e3e6e3; border-radius:19px;
+        overflow:hidden; box-shadow:0 14px 35px rgba(25,28,29,.055); }
+      .campaign-card-top { border-top:5px solid #f8d335; padding:17px 20px 12px; }
+      .campaign-card-kicker { color:#917500; font-size:.68rem; letter-spacing:.13em; font-weight:800; }
+      .campaign-route { display:flex; align-items:center; gap:11px; flex-wrap:wrap; margin:12px 0 11px;
+        color:#2a2c30; font-size:1.15rem; font-weight:710; letter-spacing:-.02em; }
+      .campaign-route .arrow { width:29px; height:29px; display:grid; place-items:center;
+        border-radius:8px; background:#f8d335; color:#292b2b; font-size:1.1rem; }
+      .campaign-route strong { font-weight:820; }
+      .campaign-segment { color:#686f73; font-size:.79rem; line-height:1.45; }
+      .campaign-economics { display:flex; align-items:center; justify-content:space-between;
+        gap:12px; padding:13px 20px; background:#f8f9f6; border-top:1px solid #eceeeb;
+        border-bottom:1px solid #eceeeb; }
+      .campaign-economics-label { color:#697075; font-size:.72rem; }
+      .campaign-economics strong { color:#252728; display:block; font-size:1.37rem;
+        letter-spacing:-.035em; margin-top:2px; }
+      .campaign-channel { padding:6px 10px; border-radius:99px; color:#58480a; background:#fff0ad;
+        font-size:.75rem; font-weight:760; white-space:nowrap; }
+      .campaign-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0;
+        padding:13px 20px 0; }
+      .campaign-stat { padding:4px 10px 4px 0; }
+      .campaign-stat-label { color:#858b8e; font-size:.69rem; line-height:1.35; }
+      .campaign-stat-value { color:#292d2e; font-weight:750; font-size:.91rem; margin-top:5px; }
+      .campaign-why { margin:16px 20px 12px; border-left:3px solid #f8d335;
+        padding:7px 10px; background:#fffdf4; color:#4b5355; font-size:.78rem; line-height:1.52; }
+      .campaign-foot { padding:0 20px 17px; color:#90969a; font-size:.68rem; line-height:1.4; }
+      .audience-chart,.pilot-chart { box-shadow:0 8px 28px rgba(25,28,29,.035); }
+      .audience-fill { background:linear-gradient(90deg,#f5d340,#e8b817); }
+      .pilot-bar.positive { background:#4f9a6b; }
+      .pilot-bar.negative { background:#d28578; }
+      .scenario-grid { margin:14px 0; }
+      .scenario-box { border:1px solid #e0e4e0; padding:17px; }
+      .scenario-box:last-child { background:#fff9df; border-color:#ebd789; }
+      .scenario-delta { display:flex; gap:10px; flex-wrap:wrap; margin:8px 0 6px; }
+      .scenario-delta span { background:#f3f5f0; border:1px solid #e5e9e3; border-radius:99px;
+        color:#424a4a; font-size:.75rem; font-weight:680; padding:7px 10px; }
+      .insight-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:12px; margin:9px 0 15px; }
+      .insight-card { background:#fff; border:1px solid #e2e6e2; border-radius:15px;
+        padding:18px 19px; min-height:164px; box-shadow:0 8px 26px rgba(25,28,29,.035); }
+      .insight-card:first-child { background:#232628; border-color:#232628; color:#fff; }
+      .insight-card:last-child { background:#fff9dd; border-color:#ead889; }
+      .insight-kicker { color:#9a7b10; font-size:.69rem; font-weight:800; letter-spacing:.11em; }
+      .insight-card:first-child .insight-kicker { color:#f8d335; }
+      .insight-card strong { display:block; font-size:1.21rem; line-height:1.25;
+        letter-spacing:-.025em; margin:11px 0 8px; }
+      .insight-card p { color:#697176; font-size:.79rem; line-height:1.5; margin:0; }
+      .insight-card:first-child p { color:#c9cfca; }
+      .insight-foot { color:#777e82; font-size:.78rem; line-height:1.5; margin-bottom:10px; }
+      @media (max-width: 1090px) {
+        .hero-grid { grid-template-columns:1fr; gap:0; }
+        .hero-copy { padding-bottom:10px; }
+        .hero-visual { min-height:185px; }
+        .hero-orbit-outer { width:205px; height:205px; }
+        .hero-orbit-inner { width:156px; height:156px; }
+        .hero-pulse { width:130px; height:130px; }
+        .hero-visual:before { right:calc(50% - 90px); top:0; }
+        .hero-visual:after { left:calc(50% - 80px); bottom:3px; }
+        .hero-number strong { font-size:1.85rem; }
+        .hero { padding:28px 30px 0; }
+      }
+      @media (max-width: 920px) {
+        .metrics.result { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .campaign-cards { grid-template-columns:1fr; }
+        .decision-flow { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .flow-step:nth-child(2):after { display:none; }
+        .insight-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .insight-card:last-child { grid-column:1/-1; min-height:120px; }
+      }
+      @media (max-width: 620px) {
+        .hero { padding:22px 21px 0; }
+        .hero h1 { font-size:2rem; }
+        .hero-meta { flex-wrap:wrap; }
+        .hero-live { margin-left:0; }
+        .hero-steps { gap:6px; font-size:.63rem; }
+        .hero-steps i { width:12px; }
+        .hero-footer { gap:8px; }
+        .metrics,.metrics.result { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .metric { padding:13px; min-height:103px; }
+        .metric-value { font-size:1.08rem; white-space:normal; overflow-wrap:anywhere; }
+        .portfolio-board { grid-template-columns:1fr; }
+        .budget-breakdown { grid-template-columns:1fr; }
+        .campaign-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .decision-flow { gap:8px; }
+        .flow-step { min-height:95px; }
+        .insight-grid { grid-template-columns:1fr; }
+        .insight-card:last-child { grid-column:auto; }
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .hero-pulse { animation:orbit-glow 6s ease-in-out infinite; }
+        .hero-visual:before { animation:node-glow 3.6s ease-in-out infinite; }
+        .campaign-card { animation:card-enter .5s ease-out both; }
+        .campaign-card:nth-child(2) { animation-delay:.08s; }
+      }
+      @keyframes orbit-glow { 50% { box-shadow:0 20px 65px rgba(248,211,53,.17),inset 0 0 0 1px rgba(248,211,53,.45); } }
+      @keyframes node-glow { 50% { box-shadow:0 0 28px rgba(248,211,53,1); transform:scale(1.25); } }
+      @keyframes card-enter { from { opacity:0; transform:translateY(11px); } to { opacity:1; transform:translateY(0); } }
     </style>
     """,
     unsafe_allow_html=True,
@@ -268,24 +470,49 @@ def _metric(label: str, value: str, help_text: str = "") -> str:
     )
 
 
-def _hero_html(compact: bool) -> str:
-    css = "hero compact" if compact else "hero"
+def _hero_html(overview: dict, result: dict | None) -> str:
+    ready = result is not None
+    if ready:
+        main_value = _money(result["agent_estimated_final_net"], signed=True)
+        main_label = "ПРОГНОЗ ФИНАЛЬНЫХ КАМПАНИЙ"
+        art_note = "После затрат на финальные контакты · без пилотов"
+        state = "План рассчитан"
+    else:
+        main_value = _number(overview["audience_count"])
+        main_label = "АБОНЕНТОВ В ТЕКУЩЕЙ БАЗЕ"
+        art_note = "Основа для проверки гипотез"
+        state = "Готов к анализу"
     return (
-        f'<div class="{css}">'
-        '<div class="hero-meta"><span class="brand-dot"></span>Планирование тарифных кампаний</div>'
-        '<h1>AI-оптимизатор маркетинговых кампаний</h1>'
+        '<div class="hero">'
+        '<div class="hero-grid"><div class="hero-copy">'
+        '<div class="hero-meta"><span class="brand-dot"></span>ШТАБ ТАРИФНЫХ КАМПАНИЙ'
+        f'<span class="hero-live">{_text(state)}</span></div>'
+        '<h1>AI-оптимизатор<br><span>маркетинговых кампаний</span></h1>'
         '<p class="hero-sub">Интеллектуальный подбор и оптимизация тарифных кампаний</p>'
-        '<p class="hero-desc">Анализ абонентской базы, проверка гипотез и '
-        'формирование оптимального портфеля кампаний.</p>'
-        '<span class="hero-note">Локальная работа · синтетические данные кейса</span>'
-        "</div>"
+        '<p class="hero-desc">От абонентской базы и пилотных наблюдений — '
+        'к проверенному плану действий с учётом стоимости и лимитов.</p>'
+        '<div class="hero-steps"><span>01 Анализ</span><i></i><span>02 Пилоты</span>'
+        '<i></i><span>03 Портфель</span></div>'
+        '</div><div class="hero-visual" aria-label="Ключевой показатель сценария">'
+        '<div class="hero-orbit hero-orbit-outer"></div>'
+        '<div class="hero-orbit hero-orbit-inner"></div>'
+        '<div class="hero-pulse"></div>'
+        '<div class="hero-number">'
+        f'<div class="hero-number-label">{_text(main_label)}</div>'
+        f'<strong>{_text(main_value)}</strong>'
+        f'<span>{_text(art_note)}</span>'
+        '</div></div></div>'
+        '<div class="hero-footer"><span>ЛОКАЛЬНАЯ СРЕДА</span>'
+        '<span>Синтетические данные кейса</span></div>'
+        '</div>'
     )
 
 
 def _metrics_html(overview: dict, result: dict | None) -> str:
     if result is None:
+        segmented = sum(int(item["audience_count"]) for item in overview["segment_map"])
         items = [
-            ("Абонентов проанализировано", _number(overview["audience_count"]), "Текущая синтетическая база"),
+            ("Профилей с тарифом и сегментом", _number(segmented), f"Из {_number(overview['audience_count'])} в базе"),
             ("Доступный бюджет", _money(overview["max_budget"]), "Верхний предел по кейсу"),
             ("Тарифов для выбора", _number(overview["tariff_count"]), "Справочник тарифов"),
             ("Лимит контактов", _number(overview["max_contacts"]), "Пилоты и итоговый план вместе"),
@@ -294,10 +521,8 @@ def _metrics_html(overview: dict, result: dict | None) -> str:
         totals = result["totals"]
         target = sum(item["new_unique_customers"] for item in result["campaigns"])
         items = [
-            ("Абонентов проанализировано", _number(totals["audience_count"]), "Текущая база"),
             ("Выбрано кампаний", _number(totals["campaign_count"]), "Не более 10"),
             ("Адресатов итогового плана", _number(target), "Без повторов внутри плана"),
-            ("Оценка эффекта плана", _money(result["agent_estimated_final_net"], signed=True), "Прогноз агента, без пилотов"),
             ("Использовано бюджета", _money(totals["budget_used"]), f"Из {_money(totals['budget'])}"),
             ("Всего контактов", _number(totals["contacts_used"]), f"Из {_number(totals['contacts_limit'])}, включая пилоты"),
         ]
@@ -337,35 +562,62 @@ def _timeline_html(
 
 def _portfolio_summary(result: dict) -> str:
     totals = result["totals"]
-    forecast = result["agent_estimated_final_net"]
-    strip = [
-        ("Кампаний", _number(totals["campaign_count"])),
-        ("Бюджет сценария", _money(totals["budget"])),
-        ("Потрачено", _money(totals["budget_used"])),
-        ("Прогноз для плана", _money(forecast, signed=True)),
-    ]
     used_pct = 0 if totals["budget"] == 0 else min(100, totals["budget_used"] / totals["budget"] * 100)
     pilot_pct = 0 if totals["budget"] == 0 else min(100, totals["pilot_cost"] / totals["budget"] * 100)
     final_pct = 0 if totals["budget"] == 0 else min(100 - pilot_pct, totals["final_cost"] / totals["budget"] * 100)
     contact_pct = totals["contacts_used"] / totals["contacts_limit"] * 100
-    return (
-        '<div class="portfolio-strip">'
-        + "".join(
-            f'<div class="strip-item"><div class="strip-label">{_text(label)}</div>'
-            f'<div class="strip-value">{_text(value)}</div></div>'
-            for label, value in strip
-        )
-        + "</div>"
-        + f'<div class="bar-shell" aria-label="Использовано бюджета {used_pct:.1f} процента">'
-        + f'<div class="bar-pilot" style="width:{pilot_pct:.2f}%"></div>'
-        + f'<div class="bar-final" style="width:{final_pct:.2f}%"></div></div>'
-        + f'<div class="bar-meta"><span>Бюджет: пилоты {_text(_money(totals["pilot_cost"]))} · '
-        + f'кампании {_text(_money(totals["final_cost"]))}</span><span>{used_pct:.1f}%</span></div>'
-        + f'<div class="bar-shell" style="margin-top:11px" aria-label="Использовано контактов {contact_pct:.1f} процента">'
-        + f'<div class="bar-used" style="width:{contact_pct:.2f}%"></div></div>'
-        + f'<div class="bar-meta"><span>Контакты: пилоты {_number(totals["pilot_contacts"])} · '
-        + f'кампании {_number(totals["final_contacts"])}</span><span>{contact_pct:.1f}%</span></div>'
+    allocated_pct = pilot_pct + final_pct
+    budget_gradient = (
+        f"conic-gradient(#272a2d 0 {pilot_pct:.2f}%, "
+        f"#f8d335 {pilot_pct:.2f}% {allocated_pct:.2f}%, "
+        f"#e8ebe8 {allocated_pct:.2f}% 100%)"
     )
+    return (
+        '<div class="portfolio-board">'
+        f'<div class="budget-ring" style="background:{budget_gradient}" '
+        f'aria-label="Использовано {_number(used_pct)} процентов бюджета">'
+        '<div class="budget-ring-core">'
+        f'<strong>{_number(used_pct)}%</strong><span>бюджета использовано</span></div></div>'
+        '<div><div class="portfolio-board-title">Куда распределён бюджет сценария</div>'
+        '<div class="budget-breakdown">'
+        '<div class="budget-part" style="--part-color:#272a2d">'
+        '<span class="budget-part-label">Пилотные проверки</span>'
+        f'<div class="budget-part-value">{_text(_money(totals["pilot_cost"]))}</div></div>'
+        '<div class="budget-part" style="--part-color:#f8d335">'
+        '<span class="budget-part-label">Финальные кампании</span>'
+        f'<div class="budget-part-value">{_text(_money(totals["final_cost"]))}</div></div>'
+        '<div class="budget-part" style="--part-color:#e8ebe8">'
+        '<span class="budget-part-label">Остаток</span>'
+        f'<div class="budget-part-value">{_text(_money(max(0, totals["budget_remaining"])))}</div></div>'
+        '</div><div class="portfolio-contacts">'
+        f'<div class="bar-shell" aria-label="Использовано контактов {contact_pct:.1f} процента">'
+        f'<div class="bar-used" style="width:{contact_pct:.2f}%"></div></div>'
+        f'<div class="bar-meta"><span>Контакты: пилоты {_number(totals["pilot_contacts"])} · '
+        f'кампании {_number(totals["final_contacts"])}</span>'
+        f'<span>{_number(totals["contacts_used"])} из {_number(totals["contacts_limit"])}</span>'
+        '</div></div></div></div>'
+    )
+
+
+def _decision_flow_html(result: dict) -> str:
+    hypotheses = next(
+        (int(event["n_customers"]) for event in result["events"] if event.get("stage") == "hypotheses"),
+        0,
+    )
+    totals = result["totals"]
+    values = [
+        ("Абонентская база", _number(totals["audience_count"]), "входные профили"),
+        ("Гипотезы", _number(hypotheses), "сформировано агентом"),
+        ("Пилоты", _number(totals["pilot_count"]), "проверено на текущей базе"),
+        ("План действий", _number(totals["campaign_count"]), "финальные кампании"),
+    ]
+    return '<div class="decision-flow">' + ''.join(
+        '<div class="flow-step">'
+        f'<div class="flow-label">{_text(label)}</div>'
+        f'<div class="flow-value">{_text(value)}</div>'
+        f'<div class="flow-note">{_text(note)}</div></div>'
+        for label, value, note in values
+    ) + '</div>'
 
 
 def _audience_chart_html(overview: dict) -> str:
@@ -390,7 +642,7 @@ def _audience_chart_html(overview: dict) -> str:
         '<div class="section-eyebrow">Структура базы</div>'
         '<div style="font-weight:700;margin-bottom:4px">Абоненты по уровню выручки</div>'
         + "".join(rows)
-        + f'<div class="evidence-note">Показаны {_number(labelled)} профилей '
+        + f'<div class="evidence-note">Показано {_number(labelled)} профилей '
         f'из {_number(overview["audience_count"])} с заполненными тарифом и сегментом.</div>'
         "</div>"
     )
@@ -433,7 +685,7 @@ def _pilot_chart_html(pilots: list[dict]) -> str:
     )
 
 
-def _campaign_card(campaign: dict, index: int, pilots: list[dict]) -> None:
+def _campaign_card(campaign: dict, index: int, pilots: list[dict]) -> str:
     forecast = campaign["expected_net"]
     matching_pilots = [
         pilot for pilot in pilots
@@ -455,84 +707,136 @@ def _campaign_card(campaign: dict, index: int, pilots: list[dict]) -> None:
         else "Надёжно положительный вариант не найден. Агент выбрал небольшой сегмент и бесплатный "
              "канал, чтобы ограничить возможный ущерб при обязательном итоговом плане."
     )
-    fields = [
-        ("Сегмент", _segment(campaign)),
-        ("Абонентов в сегменте", _number(campaign["matched"])),
-        ("Текущий тариф", _tariff(campaign["current_tariff"])),
-        ("Предлагаемый тариф", _tariff(campaign["target_tariff"])),
-        ("Канал", _channel(campaign["channel"])),
+    stats = [
+        ("Размер сегмента", _number(campaign["matched"])),
+        ("Контакты по плану", _number(campaign["contacts"])),
         ("Стоимость контактов", _money(campaign["cost"])),
     ]
-    with st.container(border=True):
-        st.markdown(
-            '<div class="campaign-heading">'
-            f'<div class="campaign-name">Кампания №{index}</div>'
-            '<div class="campaign-tag">Прогноз чистого эффекта<br>'
-            f'<strong>{_text(_money(forecast, signed=True) if forecast is not None else "Нет надёжной оценки")}</strong></div>'
-            "</div>"
-            '<div class="campaign-grid">'
-            + "".join(
-                '<div class="campaign-field">'
-                f'<div class="campaign-field-label">{_text(label)}</div>'
-                f'<div class="campaign-field-value">{_text(value)}</div></div>'
-                for label, value in fields
-            )
-            + "</div>",
-            unsafe_allow_html=True,
+    return (
+        '<div class="campaign-card">'
+        '<div class="campaign-card-top">'
+        f'<div class="campaign-card-kicker">РЕКОМЕНДАЦИЯ {index:02d}</div>'
+        '<div class="campaign-route">'
+        f'<span>{_text(_tariff(campaign["current_tariff"]))}</span>'
+        '<span class="arrow">→</span>'
+        f'<strong>{_text(_tariff(campaign["target_tariff"]))}</strong></div>'
+        f'<div class="campaign-segment">{_text(_segment(campaign))}</div></div>'
+        '<div class="campaign-economics"><div>'
+        '<div class="campaign-economics-label">Прогноз кампании после затрат</div>'
+        f'<strong>{_text(_money(forecast, signed=True) if forecast is not None else "Нет надёжной оценки")}</strong>'
+        '</div>'
+        f'<span class="campaign-channel">{_text(_channel(campaign["channel"]))}</span></div>'
+        '<div class="campaign-stats">'
+        + ''.join(
+            '<div class="campaign-stat">'
+            f'<div class="campaign-stat-label">{_text(label)}</div>'
+            f'<div class="campaign-stat-value">{_text(value)}</div></div>'
+            for label, value in stats
         )
-        with st.expander(f"Почему выбрана кампания №{index}"):
-            st.markdown(f'<div class="campaign-reason">{_text(reason)}</div>', unsafe_allow_html=True)
-            st.caption(
-                f"Контактов по плану: {_number(campaign['contacts'])}. "
-                f"Повторных контактов внутри финального плана: {_number(campaign['repeat_contacts'])}. "
-                "Прогноз относится только к этой финальной кампании и не учитывает эффект пилотов."
-            )
+        + '</div>'
+        f'<div class="campaign-why"><b>Почему выбрана:</b> {_text(reason)}</div>'
+        f'<div class="campaign-foot">Повторных контактов внутри финального плана: '
+        f'{_number(campaign["repeat_contacts"])}. Прогноз не включает затраты и эффект пилотов.</div>'
+        '</div>'
+    )
 
 
-def _explanation(result: dict) -> str:
+def _explanation_html(result: dict) -> str:
     totals = result["totals"]
     rejected_count = len(result["rejected"])
     if result["agent_estimated_final_net"] is None:
         return (
-            f"Агент провёл {_number(totals['pilot_count'])} "
-            f"{_plural(totals['pilot_count'], ('пилот', 'пилота', 'пилотов'))}, "
-            "но не получил достаточно "
-            "надёжных оснований для прибыльного портфеля. Итоговая бесплатная кампания "
-            "ограничивает дополнительный расход и выполняет требование кейса о наличии плана. "
-            f"По неположительной консервативной оценке отклонено {_number(rejected_count)} "
-            f"{_plural(rejected_count, ('гипотеза', 'гипотезы', 'гипотез'))}."
+            '<div class="insight-grid">'
+            '<div class="insight-card"><div class="insight-kicker">РЕЗУЛЬТАТ ПРОВЕРКИ</div>'
+            '<strong>Надёжно прибыльный портфель не найден</strong>'
+            f'<p>Агент провёл {_number(totals["pilot_count"])} '
+            f'{_plural(totals["pilot_count"], ("пилот", "пилота", "пилотов"))} '
+            'на текущей базе.</p></div>'
+            '<div class="insight-card"><div class="insight-kicker">МАЛОЗАТРАТНЫЙ ПЛАН</div>'
+            '<strong>Бесплатный канал</strong><p>Небольшая финальная кампания '
+            'ограничивает дополнительные расходы и выполняет требование кейса о наличии плана.</p></div>'
+            '<div class="insight-card"><div class="insight-kicker">ОТСЕВ ГИПОТЕЗ</div>'
+            f'<strong>{_number(rejected_count)} отклонено</strong>'
+            '<p>Консервативная оценка этих переходов после пилотов не стала положительной.</p>'
+            '</div></div>'
         )
-    first = (
-        f"Агент провёл {_number(totals['pilot_count'])} "
-        f"{_plural(totals['pilot_count'], ('пилот', 'пилота', 'пилотов'))}. "
-        f"В портфеле — {_number(totals['campaign_count'])} "
-        f"{_plural(totals['campaign_count'], ('кампания', 'кампании', 'кампаний'))} "
-        "с положительной консервативной оценкой эффекта."
-    )
     ranked = [item for item in result["campaigns"] if item["expected_net"] is not None]
     if ranked:
         top = max(ranked, key=lambda item: float(item["expected_net"]))
-        example = (
-            f"Наибольший прогноз чистого эффекта у сегмента «{_tariff(top['current_tariff'])}, "
-            f"{_segment(top)}»: переход на {_tariff(top['target_tariff'])} через "
-            f"{_channel(top['channel']).lower()}. Ожидаемый прирост {_money(top['expected_lift'])} "
-            f"покрывает стоимость контактов {_money(top['cost'])} "
-            f"Прогноз чистого эффекта — {_money(top['expected_net'], signed=True)}"
+        route = f"{_tariff(top['current_tariff'])} → {_tariff(top['target_tariff'])}"
+        leader_note = (
+            f"{_segment(top)} · {_channel(top['channel'])}. "
+            f"Прогноз {_money(top['expected_net'], signed=True)} после стоимости контактов "
+            f"{_money(top['cost'])}"
         )
     else:
-        example = "Выбранные сегменты прошли консервативную оценку эффекта после пилотов."
+        route = "Портфель после пилотов"
+        leader_note = "Выбранные сегменты прошли консервативную оценку эффекта."
     if totals["campaign_count"] >= 10:
-        second = "Достигнут лимит в 10 финальных кампаний."
+        limit_note = "Достигнут лимит в 10 финальных кампаний."
     elif totals["contacts_used"] >= totals["contacts_limit"]:
-        second = "Достигнут общий лимит контактов."
+        limit_note = "Достигнут общий лимит контактов."
     else:
-        second = "Остаток бюджета сохранён: дополнительные гипотезы не прошли отбор в текущий портфель."
-    rejected = (
-        f"По неположительной консервативной оценке отклонено {_number(rejected_count)} "
-        f"{_plural(rejected_count, ('гипотеза', 'гипотезы', 'гипотез'))}. "
-        if rejected_count else ""
+        limit_note = (
+            f"Остаток бюджета {_money(max(0, totals['budget_remaining']))}: "
+            "дополнительные гипотезы не прошли отбор."
+        )
+    return (
+        '<div class="insight-grid">'
+        '<div class="insight-card"><div class="insight-kicker">ПРОВЕРКА ГИПОТЕЗ</div>'
+        f'<strong>{_number(totals["pilot_count"])} пилотов</strong>'
+        f'<p>После проверки выбрано {_number(totals["campaign_count"])} '
+        f'{_plural(totals["campaign_count"], ("кампания", "кампании", "кампаний"))} '
+        'с положительной консервативной оценкой эффекта.</p></div>'
+        '<div class="insight-card"><div class="insight-kicker">ЛИДЕР ПОРТФЕЛЯ</div>'
+        f'<strong>{_text(route)}</strong><p>{_text(leader_note)}</p></div>'
+        '<div class="insight-card"><div class="insight-kicker">КОНТРОЛЬ РИСКА</div>'
+        f'<strong>{_number(rejected_count)} гипотез отклонено</strong>'
+        '<p>Нижняя оценка их эффекта после пилотов не превышает нуля.</p></div>'
+        '</div>'
+        f'<div class="insight-foot">{_text(limit_note)}</div>'
     )
-    return first + " " + example + " " + rejected + second
+
+
+def _scenario_comparison_html(previous: dict, result: dict) -> str:
+    old = previous["totals"]
+    new = result["totals"]
+    old_forecast = previous["agent_estimated_final_net"]
+    new_forecast = result["agent_estimated_final_net"]
+    deltas = [
+        ("Лимит бюджета", _money(new["budget"] - old["budget"], signed=True)),
+        ("Расходы", _money(new["budget_used"] - old["budget_used"], signed=True)),
+        ("Контакты", f"{new['contacts_used'] - old['contacts_used']:+,}".replace(",", " ")),
+    ]
+    if old_forecast is not None and new_forecast is not None:
+        deltas.insert(0, ("Прогноз финальных кампаний", _money(new_forecast - old_forecast, signed=True)))
+    old_plan = [(item["filters"], item["target_tariff"], item["channel"]) for item in previous["campaigns"]]
+    new_plan = [(item["filters"], item["target_tariff"], item["channel"]) for item in result["campaigns"]]
+    composition = (
+        f"Состав финального плана не изменился. Новый лимит покрывает его расходы "
+        f"{_money(new['budget_used'])}"
+        if old_plan == new_plan else
+        "Состав финального плана изменился после повторного запуска пилотов и оптимизации."
+    )
+    return (
+        '<div class="scenario-grid">'
+        '<div class="scenario-box"><div class="scenario-title">Предыдущий сценарий</div>'
+        f'<div class="scenario-value">Бюджет: {_text(_money(old["budget"]))}<br>'
+        f'Кампаний: {_number(old["campaign_count"])}<br>'
+        f'Прогноз финальных кампаний: {_text(_money(old_forecast, signed=True))}</div></div>'
+        '<div class="scenario-box"><div class="scenario-title">Новый сценарий</div>'
+        f'<div class="scenario-value">Бюджет: {_text(_money(new["budget"]))}<br>'
+        f'Кампаний: {_number(new["campaign_count"])}<br>'
+        f'Прогноз финальных кампаний: {_text(_money(new_forecast, signed=True))}</div></div>'
+        '</div><div class="scenario-delta">'
+        + ''.join(
+            f'<span>{_text(label)}: {_text(value)}</span>'
+            for label, value in deltas
+        )
+        + f'</div><div class="evidence-note">{_text(composition)} '
+        'Прогнозы относятся только к финальным кампаниям; результаты пилотов могут отличаться между запусками.'
+        '</div>'
+    )
 
 
 def _rejected_title(item: dict) -> str:
@@ -563,7 +867,7 @@ except Exception:
 result = st.session_state.get("current_scenario")
 
 hero_slot = st.empty()
-hero_slot.markdown(_hero_html(result is not None), unsafe_allow_html=True)
+hero_slot.markdown(_hero_html(overview, result), unsafe_allow_html=True)
 
 kpi_slot = st.empty()
 kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
@@ -588,6 +892,7 @@ with st.container(border=True):
             key="scenario_budget_text",
         )
         budget = _parse_budget(budget_text, int(overview["max_budget"]))
+        st.caption("Предел по ТЗ — 100 000 у.е. на пилоты и финальные кампании вместе.")
     with rules_col:
         st.markdown(
             '<div style="padding-top:9px"><span class="rule-chip">Максимум кампаний: 10</span>'
@@ -657,7 +962,7 @@ if run_clicked:
         st.error("Не удалось сформировать план. Проверьте бюджет и наличие исходных данных проекта.")
         st.stop()
     st.session_state["current_scenario"] = result
-    hero_slot.markdown(_hero_html(True), unsafe_allow_html=True)
+    hero_slot.markdown(_hero_html(overview, result), unsafe_allow_html=True)
     kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
 
 if result is None:
@@ -694,6 +999,9 @@ progress_slot.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown("### От данных к решению")
+st.markdown(_decision_flow_html(result), unsafe_allow_html=True)
+
 st.markdown("### Рекомендованный портфель кампаний")
 st.markdown(
     '<p class="section-intro">Финальный план построен в пределах выбранного бюджета. '
@@ -703,8 +1011,18 @@ st.markdown(
 with st.container(border=True):
     st.markdown(_portfolio_summary(result), unsafe_allow_html=True)
 
-for number, campaign in enumerate(result["campaigns"], start=1):
-    _campaign_card(campaign, number, result["pilots"])
+previous = st.session_state.get("previous_scenario")
+if previous is not None and previous["totals"]["budget"] != result["totals"]["budget"]:
+    st.markdown("### Сценарный анализ")
+    st.markdown(_scenario_comparison_html(previous, result), unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="campaign-cards">'
+    + ''.join(_campaign_card(campaign, number, result["pilots"])
+              for number, campaign in enumerate(result["campaigns"], start=1))
+    + '</div>',
+    unsafe_allow_html=True,
+)
 
 download_col, note_col = st.columns([1, 2], gap="large")
 with download_col:
@@ -722,8 +1040,7 @@ with note_col:
     )
 
 st.markdown("### Почему выбран именно этот план")
-with st.container(border=True):
-    st.markdown(f'<p class="business-copy">{_text(_explanation(result))}</p>', unsafe_allow_html=True)
+st.markdown(_explanation_html(result), unsafe_allow_html=True)
 
 st.markdown("### Что показали пилоты")
 pilot_count = len(result["pilots"])
@@ -789,31 +1106,6 @@ with st.container(border=True):
         'число выше не является прогнозом конкурсного результата.</div>',
         unsafe_allow_html=True,
     )
-
-previous = st.session_state.get("previous_scenario")
-if previous is not None and previous["totals"]["budget"] != result["totals"]["budget"]:
-    st.markdown("### Сценарный анализ")
-    old = previous["totals"]
-    new = result["totals"]
-    st.markdown(
-        '<div class="scenario-grid">'
-        '<div class="scenario-box"><div class="scenario-title">Предыдущий сценарий</div>'
-        f'<div class="scenario-value">Бюджет: {_text(_money(old["budget"]))}<br>'
-        f'Кампаний: {_number(old["campaign_count"])}<br>'
-        f'Прогноз плана: {_text(_money(previous["agent_estimated_final_net"], signed=True))}</div></div>'
-        '<div class="scenario-box"><div class="scenario-title">Новый сценарий</div>'
-        f'<div class="scenario-value">Бюджет: {_text(_money(new["budget"]))}<br>'
-        f'Кампаний: {_number(new["campaign_count"])}<br>'
-        f'Прогноз плана: {_text(_money(result["agent_estimated_final_net"], signed=True))}</div></div>'
-        "</div>",
-        unsafe_allow_html=True,
-    )
-    old_plan = [(item["filters"], item["target_tariff"], item["channel"]) for item in previous["campaigns"]]
-    new_plan = [(item["filters"], item["target_tariff"], item["channel"]) for item in result["campaigns"]]
-    if old_plan == new_plan:
-        st.caption("Состав финального плана не изменился при новом бюджете.")
-    else:
-        st.caption("Состав финального плана изменился после повторного запуска пилотов и оптимизации.")
 
 st.markdown(
     '<div class="evidence-note" style="margin-top:20px">Все данные в этом интерфейсе синтетические. '
