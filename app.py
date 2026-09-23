@@ -15,14 +15,15 @@ from io import StringIO
 import pandas as pd
 import streamlit as st
 
-from dashboard_service import get_overview, run_scenario
+from dashboard_service import get_overview
+from openai_demo_agent import run_openai_demo
 
 
 LOGGER = logging.getLogger(__name__)
 
 
 st.set_page_config(
-    page_title="AI-оптимизатор маркетинговых кампаний",
+    page_title="Штаб тарифных кампаний · TAZART",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -147,6 +148,19 @@ st.markdown(
       .scenario-box { background:#f7f8f8; border:1px solid #eceeef; border-radius:12px; padding:13px; }
       .scenario-title { font-size:.75rem; color:#747a80; text-transform:uppercase; letter-spacing:.04em; }
       .scenario-value { font-size:1rem; font-weight:720; color:#25282c; margin-top:6px; line-height:1.5; }
+      .ai-panel { background:#fff; border:1px solid #e8eaed; border-left:4px solid #f8d335;
+        border-radius:16px; padding:16px 19px; margin:9px 0 17px;
+        box-shadow:0 4px 18px rgba(24,26,30,.035); }
+      .ai-status { display:inline-flex; align-items:center; gap:8px; font-size:.83rem;
+        font-weight:750; color:#282b2f; }
+      .ai-status:before { content:""; width:8px; height:8px; border-radius:50%;
+        background:#f1cc2e; box-shadow:0 0 0 4px rgba(241,204,46,.17); }
+      .ai-panel.fallback .ai-status:before { background:#92979c; box-shadow:0 0 0 4px #edf0f1; }
+      .ai-caption { color:#70767d; font-size:.79rem; margin-top:5px; }
+      .ai-report { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+      .ai-report div { background:#f7f8f8; border-radius:10px; padding:11px 13px;
+        color:#444a50; font-size:.85rem; line-height:1.5; }
+      .ai-report b { display:block; color:#24272b; font-size:.76rem; margin-bottom:4px; }
       @media (max-width: 1350px) {
         .metrics.result { grid-template-columns:repeat(3,minmax(0,1fr)); }
         .timeline { grid-template-columns:repeat(3,minmax(0,1fr)); }
@@ -160,6 +174,7 @@ st.markdown(
         .hero { padding:20px; }
         .timeline, .campaign-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
         .scenario-grid { grid-template-columns:1fr; }
+        .ai-report { grid-template-columns:1fr; }
         .audience-row, .pilot-row { grid-template-columns:108px minmax(0,1fr) 64px; gap:6px; }
       }
       /* Рабочий штаб: контраст, движение и иерархия без внешних ассетов. */
@@ -178,8 +193,8 @@ st.markdown(
           repeating-linear-gradient(90deg,transparent 0 65px,rgba(255,255,255,.025) 66px 67px);
         pointer-events:none; }
       .hero-grid { position:relative; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(295px,.88fr);
-        gap:25px; align-items:center; min-height:275px; }
-      .hero-copy { position:relative; z-index:2; padding-bottom:28px; }
+        gap:25px; align-items:center; min-height:255px; }
+      .hero-copy { position:relative; z-index:2; padding-bottom:17px; }
       .hero-meta { color:#f8d335; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; gap:10px; }
       .brand-dot { width:17px; height:17px; background:#f8d335; box-shadow:inset -6px 0 #17191b;
         border:1px solid rgba(255,255,255,.5); }
@@ -189,15 +204,22 @@ st.markdown(
       .hero-live:before { content:""; width:6px; height:6px; background:#f7d334; border-radius:50%;
         box-shadow:0 0 0 4px rgba(247,211,52,.14); }
       .hero h1 { color:#fff; font-size:clamp(2rem,3.5vw,3.35rem); line-height:1.04;
-        letter-spacing:-.055em; margin:24px 0 13px; font-weight:800; }
+        letter-spacing:-.055em; margin:17px 0 10px; font-weight:800; }
       .hero h1 span { color:#f8d335; }
       .hero-sub { color:#f4f5f2; font-size:1rem; font-weight:650; }
-      .hero-desc { color:#b7bcb8; max-width:590px; font-size:.93rem; line-height:1.55; }
+      .hero-desc { color:#b7bcb8; max-width:590px; font-size:.9rem; line-height:1.5; }
+      .hero-guide { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px;
+        max-width:670px; margin-top:16px; }
+      .hero-guide div { border-left:2px solid #f8d335; padding-left:11px; }
+      .hero-guide b { display:block; color:#f8d335; font-size:.65rem;
+        letter-spacing:.12em; text-transform:uppercase; }
+      .hero-guide span { display:block; color:#e5e9e5; font-size:.78rem;
+        line-height:1.4; margin-top:3px; }
       .hero-steps { display:flex; align-items:center; flex-wrap:wrap; gap:10px;
         color:#c9cdc9; font-size:.69rem; font-weight:750; letter-spacing:.08em;
         text-transform:uppercase; margin-top:23px; }
       .hero-steps i { height:1px; width:23px; background:#7a806f; }
-      .hero-visual { position:relative; min-height:275px; display:grid; place-items:center; isolation:isolate; }
+      .hero-visual { position:relative; min-height:255px; display:grid; place-items:center; isolation:isolate; }
       .hero-orbit { position:absolute; border:1px solid rgba(248,211,53,.28); border-radius:50%; }
       .hero-orbit-outer { width:280px; height:280px; box-shadow:0 0 0 37px rgba(248,211,53,.025); }
       .hero-orbit-inner { width:218px; height:218px; border-style:dashed; border-color:rgba(255,255,255,.23); }
@@ -227,8 +249,15 @@ st.markdown(
         height:3px; background:#f0d453; }
       .metric-label { color:#687078; font-weight:600; }
       .metric-value { font-size:clamp(1.35rem,2.2vw,1.9rem); letter-spacing:-.035em; }
-      .metric-help { color:#8a9194; }
+      .metric-help { color:#737b7e; line-height:1.4; max-width:29ch; }
+      .strip-help { color:#737b7e; font-size:.7rem; line-height:1.4; margin-top:4px; }
+      .portfolio-source { color:#71797c; font-size:.73rem; line-height:1.45; margin-top:12px; }
       .section-eyebrow { color:#9c7800; font-size:.69rem; letter-spacing:.14em; }
+      .control-heading { color:#212426; font-size:1.32rem; font-weight:780;
+        letter-spacing:-.025em; line-height:1.15; margin:5px 0 5px; }
+      .control-sub { color:#6d7579; font-size:.8rem; line-height:1.4; margin-bottom:3px; }
+      .action-label { color:#686f74; font-size:.76rem; line-height:1.4;
+        margin:4px 0 9px; }
       .timeline-step { position:relative; padding:13px 15px; border:1px solid #e4e7e4;
         box-shadow:0 5px 16px rgba(25,28,29,.025); }
       .timeline-index { color:#a17b00; letter-spacing:.12em; }
@@ -291,8 +320,8 @@ st.markdown(
       .campaign-stat-label { color:#858b8e; font-size:.69rem; line-height:1.35; }
       .campaign-stat-value { color:#292d2e; font-weight:750; font-size:.91rem; margin-top:5px; }
       .campaign-why { margin:16px 20px 12px; border-left:3px solid #f8d335;
-        padding:7px 10px; background:#fffdf4; color:#4b5355; font-size:.78rem; line-height:1.52; }
-      .campaign-foot { padding:0 20px 17px; color:#90969a; font-size:.68rem; line-height:1.4; }
+        padding:7px 10px; background:#fffdf4; color:#4b5355; font-size:.82rem; line-height:1.5; }
+      .campaign-foot { padding:0 20px 17px; color:#777f83; font-size:.73rem; line-height:1.43; }
       .audience-chart,.pilot-chart { box-shadow:0 8px 28px rgba(25,28,29,.035); }
       .audience-fill { background:linear-gradient(90deg,#f5d340,#e8b817); }
       .pilot-bar.positive { background:#4f9a6b; }
@@ -318,8 +347,8 @@ st.markdown(
       .insight-foot { color:#777e82; font-size:.78rem; line-height:1.5; margin-bottom:10px; }
       @media (max-width: 1090px) {
         .hero-grid { grid-template-columns:1fr; gap:0; }
-        .hero-copy { padding-bottom:10px; }
-        .hero-visual { min-height:185px; }
+        .hero-copy { padding-bottom:8px; }
+        .hero-visual { min-height:175px; }
         .hero-orbit-outer { width:205px; height:205px; }
         .hero-orbit-inner { width:156px; height:156px; }
         .hero-pulse { width:130px; height:130px; }
@@ -337,16 +366,28 @@ st.markdown(
         .insight-card:last-child { grid-column:1/-1; min-height:120px; }
       }
       @media (max-width: 620px) {
-        .hero { padding:22px 21px 0; }
-        .hero h1 { font-size:2rem; }
+        .hero { padding:18px 19px 0; }
+        .hero h1 { font-size:1.67rem; margin:11px 0 7px; }
+        .hero-sub { font-size:.86rem; line-height:1.35; }
+        .hero-desc { font-size:.76rem; line-height:1.4; margin:7px 0; }
+        .hero-guide { gap:9px; margin-top:11px; }
+        .hero-guide div { padding-left:8px; }
+        .hero-guide b { font-size:.59rem; }
+        .hero-guide span { font-size:.69rem; line-height:1.35; }
         .hero-meta { flex-wrap:wrap; }
         .hero-live { margin-left:0; }
-        .hero-steps { gap:6px; font-size:.63rem; }
-        .hero-steps i { width:12px; }
-        .hero-footer { gap:8px; }
+        .hero-visual { min-height:0; display:flex; justify-content:flex-start;
+          margin:10px 0 12px; padding:9px 12px; border:1px solid rgba(248,211,53,.23);
+          border-radius:12px; background:rgba(248,211,53,.05); }
+        .hero-orbit,.hero-pulse,.hero-visual:before,.hero-visual:after { display:none; }
+        .hero-number { text-align:left; align-items:flex-start; max-width:none; }
+        .hero-number strong { font-size:1.45rem; margin:2px 0; }
+        .hero-footer { gap:8px; padding:9px 0 11px; font-size:.62rem; }
         .metrics,.metrics.result { grid-template-columns:repeat(2,minmax(0,1fr)); }
         .metric { padding:13px; min-height:103px; }
         .metric-value { font-size:1.08rem; white-space:normal; overflow-wrap:anywhere; }
+        .control-heading { font-size:1.15rem; }
+        .action-label { margin:0 0 5px; }
         .portfolio-board { grid-template-columns:1fr; }
         .budget-breakdown { grid-template-columns:1fr; }
         .campaign-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
@@ -477,22 +518,29 @@ def _hero_html(overview: dict, result: dict | None) -> str:
         main_label = "ПРОГНОЗ ФИНАЛЬНЫХ КАМПАНИЙ"
         art_note = "После затрат на финальные контакты · без пилотов"
         state = "План рассчитан"
+        step_note = "Измените бюджет и пересчитайте план для сравнения."
+        outcome_note = "Ниже — кампании, причины выбора и отклонённые гипотезы."
     else:
         main_value = _number(overview["audience_count"])
         main_label = "АБОНЕНТОВ В ТЕКУЩЕЙ БАЗЕ"
-        art_note = "Основа для проверки гипотез"
+        art_note = "Источник: синтетическая база кейса"
         state = "Готов к анализу"
+        step_note = "Задайте бюджет и нажмите «Сформировать оптимальный план»."
+        outcome_note = "Сегменты, тарифы, каналы, причины выбора и файл плана."
     return (
         '<div class="hero">'
         '<div class="hero-grid"><div class="hero-copy">'
         '<div class="hero-meta"><span class="brand-dot"></span>ШТАБ ТАРИФНЫХ КАМПАНИЙ'
         f'<span class="hero-live">{_text(state)}</span></div>'
-        '<h1>AI-оптимизатор<br><span>маркетинговых кампаний</span></h1>'
-        '<p class="hero-sub">Интеллектуальный подбор и оптимизация тарифных кампаний</p>'
-        '<p class="hero-desc">От абонентской базы и пилотных наблюдений — '
-        'к проверенному плану действий с учётом стоимости и лимитов.</p>'
-        '<div class="hero-steps"><span>01 Анализ</span><i></i><span>02 Пилоты</span>'
-        '<i></i><span>03 Портфель</span></div>'
+        '<h1>ИИ-агент для<br><span>тарифных кампаний</span></h1>'
+        '<p class="hero-sub">Ищет сегменты и тарифы с ожидаемым приростом '
+        'выручки после затрат на контакт.</p>'
+        '<p class="hero-desc">Локальный агент изучает синтетические данные, '
+        'проводит пилоты и рассчитывает план. При доступном OpenAI AI-агент '
+        'выбирает аналитические шаги и объясняет результат.</p>'
+        f'<div class="hero-guide"><div><b>Ваш шаг</b><span>{_text(step_note)}</span></div>'
+        f'<div><b>{"В результате" if ready else "На выходе"}</b>'
+        f'<span>{_text(outcome_note)}</span></div></div>'
         '</div><div class="hero-visual" aria-label="Ключевой показатель сценария">'
         '<div class="hero-orbit hero-orbit-outer"></div>'
         '<div class="hero-orbit hero-orbit-inner"></div>'
@@ -502,8 +550,8 @@ def _hero_html(overview: dict, result: dict | None) -> str:
         f'<strong>{_text(main_value)}</strong>'
         f'<span>{_text(art_note)}</span>'
         '</div></div></div>'
-        '<div class="hero-footer"><span>ЛОКАЛЬНАЯ СРЕДА</span>'
-        '<span>Синтетические данные кейса</span></div>'
+        '<div class="hero-footer"><span>by TAZART</span>'
+        '<span>Локальная среда · синтетические данные кейса</span></div>'
         '</div>'
     )
 
@@ -512,19 +560,27 @@ def _metrics_html(overview: dict, result: dict | None) -> str:
     if result is None:
         segmented = sum(int(item["audience_count"]) for item in overview["segment_map"])
         items = [
-            ("Профилей с тарифом и сегментом", _number(segmented), f"Из {_number(overview['audience_count'])} в базе"),
-            ("Доступный бюджет", _money(overview["max_budget"]), "Верхний предел по кейсу"),
-            ("Тарифов для выбора", _number(overview["tariff_count"]), "Справочник тарифов"),
-            ("Лимит контактов", _number(overview["max_contacts"]), "Пилоты и итоговый план вместе"),
+            ("Профилей для сегментации", _number(segmented),
+             f"Из {_number(overview['audience_count'])} в CSV базы · основа отбора"),
+            ("Максимальный бюджет", _money(overview["max_budget"]),
+             "Лимит кейса · пилоты и план тратят его вместе"),
+            ("Тарифов для предложения", _number(overview["tariff_count"]),
+             "Из справочника тарифов · варианты перехода"),
+            ("Лимит контактов", _number(overview["max_contacts"]),
+             "Правило кейса · пилоты и финальные обращения вместе"),
         ]
     else:
         totals = result["totals"]
         target = sum(item["new_unique_customers"] for item in result["campaigns"])
         items = [
-            ("Выбрано кампаний", _number(totals["campaign_count"]), "Не более 10"),
-            ("Адресатов итогового плана", _number(target), "Без повторов внутри плана"),
-            ("Использовано бюджета", _money(totals["budget_used"]), f"Из {_money(totals['budget'])}"),
-            ("Всего контактов", _number(totals["contacts_used"]), f"Из {_number(totals['contacts_limit'])}, включая пилоты"),
+            ("Выбрано кампаний", _number(totals["campaign_count"]),
+             "Итог работы агента · не более 10 рекомендаций"),
+            ("Адресатов итогового плана", _number(target),
+             "По сегментам кампаний · без повторов внутри плана"),
+            ("Использовано бюджета", _money(totals["budget_used"]),
+             f"Пилоты + кампании · из {_money(totals['budget'])}"),
+            ("Всего контактов", _number(totals["contacts_used"]),
+             f"Пилоты + план · из лимита {_number(totals['contacts_limit'])}"),
         ]
     css = "metrics result" if result is not None else "metrics"
     return f'<div class="{css}">' + "".join(_metric(*item) for item in items) + "</div>"
@@ -558,6 +614,40 @@ def _timeline_html(
             f'<div class="timeline-status">{_text(status)}</div></div>'
         )
     return '<div class="timeline">' + "".join(cells) + "</div>"
+
+
+def _ai_panel_html(ai_info: dict) -> str:
+    """Show the actual API outcome without treating generated prose as calculations."""
+    if not ai_info.get("active"):
+        return (
+            '<div class="ai-panel fallback">'
+            '<div class="ai-status">AI-сервис временно недоступен — используется локальный режим расчёта</div>'
+            '<div class="ai-caption">План, пилоты и все показатели рассчитаны локальным Python-кодом.</div>'
+            '</div>'
+        )
+
+    tool_labels = {
+        "analyze_segments": "анализ сегментов",
+        "check_hypotheses": "проверка гипотез",
+        "calculate_campaigns": "расчёт кампаний",
+    }
+    called = " → ".join(
+        tool_labels[name] for name in ai_info.get("tools_called", []) if name in tool_labels
+    )
+    explanation = _text(ai_info.get("explanation", ""))
+    recommendation = _text(ai_info.get("recommendation", ""))
+    return (
+        '<div class="ai-panel">'
+        '<div class="ai-status">AI-агент OpenAI: активен</div>'
+        '<div class="ai-caption">Этап: AI формирует и объясняет рекомендации. '
+        'В OpenAI переданы только агрегированные обезличенные итоги; '
+        'расчёты и ограничения проверены локально.</div>'
+        f'<div class="ai-caption">Вызваны локальные инструменты: {_text(called)}.</div>'
+        '<div class="ai-report">'
+        f'<div><b>Почему выбран план</b>{explanation}</div>'
+        f'<div><b>Рекомендация</b>{recommendation}</div>'
+        '</div></div>'
+    )
 
 
 def _portfolio_summary(result: dict) -> str:
@@ -595,7 +685,9 @@ def _portfolio_summary(result: dict) -> str:
         f'<div class="bar-meta"><span>Контакты: пилоты {_number(totals["pilot_contacts"])} · '
         f'кампании {_number(totals["final_contacts"])}</span>'
         f'<span>{_number(totals["contacts_used"])} из {_number(totals["contacts_limit"])}</span>'
-        '</div></div></div></div>'
+        '</div></div><div class="portfolio-source">Расход и контакты рассчитаны по '
+        'пилотам текущего запуска и выбранным кампаниям. Остаток бюджета можно '
+        'не тратить, если дополнительные предложения не прошли отбор.</div></div></div>'
     )
 
 
@@ -643,7 +735,8 @@ def _audience_chart_html(overview: dict) -> str:
         '<div style="font-weight:700;margin-bottom:4px">Абоненты по уровню выручки</div>'
         + "".join(rows)
         + f'<div class="evidence-note">Показано {_number(labelled)} профилей '
-        f'из {_number(overview["audience_count"])} с заполненными тарифом и сегментом.</div>'
+        f'из {_number(overview["audience_count"])} в локальной базе с заполненными '
+        'тарифом и сегментом. Эти группы помогают выбрать, где проверять переходы.</div>'
         "</div>"
     )
 
@@ -680,7 +773,8 @@ def _pilot_chart_html(pilots: list[dict]) -> str:
         '<div style="font-weight:700;margin-bottom:5px">Наблюдаемый относительный эффект</div>'
         + "".join(rows)
         + f'<div class="evidence-note">{_text(caption)} '
-        "Зелёный — положительное наблюдение, красный — отрицательное; шкала общая."
+        "Зелёный — положительное наблюдение, красный — отрицательное; шкала общая. "
+        "Шум пилота учитывается при отборе, поэтому один столбец не решает судьбу кампании."
         "</div></div>"
     )
 
@@ -694,7 +788,7 @@ def _campaign_card(campaign: dict, index: int, pilots: list[dict]) -> str:
         and pilot.get("target_tariff") == campaign.get("target_tariff")
     ]
     evidence = (
-        f"Гипотеза проверена на текущей аудитории: {_number(len(matching_pilots))} "
+        f"Переход проверен на текущей аудитории: {_number(len(matching_pilots))} "
         f"{_plural(len(matching_pilots), ('пилот', 'пилота', 'пилотов'))}. "
         if matching_pilots else ""
     )
@@ -722,7 +816,7 @@ def _campaign_card(campaign: dict, index: int, pilots: list[dict]) -> str:
         f'<strong>{_text(_tariff(campaign["target_tariff"]))}</strong></div>'
         f'<div class="campaign-segment">{_text(_segment(campaign))}</div></div>'
         '<div class="campaign-economics"><div>'
-        '<div class="campaign-economics-label">Прогноз кампании после затрат</div>'
+        '<div class="campaign-economics-label">Оценка агента после стоимости контактов</div>'
         f'<strong>{_text(_money(forecast, signed=True) if forecast is not None else "Нет надёжной оценки")}</strong>'
         '</div>'
         f'<span class="campaign-channel">{_text(_channel(campaign["channel"]))}</span></div>'
@@ -735,8 +829,10 @@ def _campaign_card(campaign: dict, index: int, pilots: list[dict]) -> str:
         )
         + '</div>'
         f'<div class="campaign-why"><b>Почему выбрана:</b> {_text(reason)}</div>'
-        f'<div class="campaign-foot">Повторных контактов внутри финального плана: '
-        f'{_number(campaign["repeat_contacts"])}. Прогноз не включает затраты и эффект пилотов.</div>'
+        '<div class="campaign-foot">Размер сегмента и стоимость рассчитаны по текущей '
+        'базе и цене канала. Пилоты по переходу могли идти в другом канале или подгруппе. '
+        f'Повторных контактов внутри финального плана: {_number(campaign["repeat_contacts"])}. '
+        'Прогноз не включает затраты и эффект пилотов.</div>'
         '</div>'
     )
 
@@ -779,7 +875,7 @@ def _explanation_html(result: dict) -> str:
     else:
         limit_note = (
             f"Остаток бюджета {_money(max(0, totals['budget_remaining']))}: "
-            "дополнительные гипотезы не прошли отбор."
+            "агент не добавил другие кампании после отбора и проверки лимитов."
         )
     return (
         '<div class="insight-grid">'
@@ -869,43 +965,37 @@ result = st.session_state.get("current_scenario")
 hero_slot = st.empty()
 hero_slot.markdown(_hero_html(overview, result), unsafe_allow_html=True)
 
-kpi_slot = st.empty()
-kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
-
 with st.container(border=True):
-    st.markdown('<div class="section-eyebrow">Управление планом</div>', unsafe_allow_html=True)
-    st.markdown("### Сформировать план кампаний")
     st.markdown(
-        '<span class="goal-chip">Цель: максимизация чистого финансового эффекта</span>'
-        + (
-            '<div class="evidence-note" style="margin-top:8px">Это единственная цель, '
-            'которую прямо поддерживает скоринг кейса.</div>'
-            if result is None else ""
-        ),
+        '<div class="section-eyebrow">Ваш следующий шаг</div>'
+        '<div class="control-heading">Задайте бюджет и запустите агента</div>'
+        '<div class="control-sub">Цель — увеличить ожидаемую выручку после стоимости '
+        'контактов, соблюдая ограничения кейса.</div>',
         unsafe_allow_html=True,
     )
-    budget_col, rules_col = st.columns([1.0, 1.5], gap="large")
+    budget_col, action_col = st.columns([1.0, 1.15], gap="large")
     with budget_col:
         budget_text = st.text_input(
-            "Бюджет кампаний, у.е.",
+            "Бюджет на пилоты и кампании, у.е.",
             value=_number(overview["max_budget"]),
             key="scenario_budget_text",
         )
         budget = _parse_budget(budget_text, int(overview["max_budget"]))
-        st.caption("Предел по ТЗ — 100 000 у.е. на пилоты и финальные кампании вместе.")
-    with rules_col:
+        button_label = (
+            "Пересчитать план"
+            if result is not None and budget is not None and budget != int(result["totals"]["budget"])
+            else "Сформировать оптимальный план"
+        )
+        run_clicked = st.button(button_label, type="primary", disabled=budget is None)
+    with action_col:
         st.markdown(
-            '<div style="padding-top:9px"><span class="rule-chip">Максимум кампаний: 10</span>'
-            '<span class="rule-chip">Пилотов: до 20</span>'
-            '<span class="rule-chip">Контактов: до 15 000</span></div>',
+            '<div class="action-label">Бюджет от 0 до 100 000 у.е. общий для пилотов '
+            'и плана. Не более 10 кампаний, 20 пилотов и 15 000 контактов.</div>',
             unsafe_allow_html=True,
         )
-    button_label = (
-        "Пересчитать план"
-        if result is not None and budget is not None and budget != int(result["totals"]["budget"])
-        else "Сформировать оптимальный план"
-    )
-    run_clicked = st.button(button_label, type="primary", disabled=budget is None)
+
+kpi_slot = st.empty()
+kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
 
 if budget is None:
     st.error(f"Введите целый бюджет от 0 до {_number(overview['max_budget'])} у.е.")
@@ -916,11 +1006,18 @@ elif result is not None and budget != int(result["totals"]["budget"]) and not ru
     )
 
 progress_slot = st.empty()
+ai_slot = st.empty()
 if run_clicked:
     if result is not None:
         st.session_state["previous_scenario"] = result
     else:
         st.session_state.pop("previous_scenario", None)
+    st.session_state.pop("current_ai", None)
+    ai_slot.markdown(
+        '<div class="ai-panel"><div class="ai-status">AI выбирает аналитические действия</div>'
+        '<div class="ai-caption">После локального расчёта AI формирует и объясняет рекомендации.</div></div>',
+        unsafe_allow_html=True,
+    )
 
     progress_state = {
         "last_stage": -1,
@@ -956,20 +1053,22 @@ if run_clicked:
             )
 
     try:
-        result = run_scenario(budget, seed=42, on_event=_on_event)
+        result, ai_info = run_openai_demo(budget, seed=42, on_event=_on_event)
     except Exception:
         LOGGER.exception("Не удалось сформировать план")
         st.error("Не удалось сформировать план. Проверьте бюджет и наличие исходных данных проекта.")
         st.stop()
     st.session_state["current_scenario"] = result
+    st.session_state["current_ai"] = ai_info
     hero_slot.markdown(_hero_html(overview, result), unsafe_allow_html=True)
     kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
 
 if result is None:
     st.markdown("### Как система решает задачу")
     st.markdown(
-        '<p class="section-intro">Агент исследует историю как предварительное предположение, '
-        'проверяет гипотезы на текущей аудитории и выбирает план с учётом стоимости каналов и лимитов.</p>',
+        '<p class="section-intro">Данные базы и история переходов → гипотезы → '
+        'пилоты на текущей аудитории → отбор с учётом шума → план в пределах лимитов. '
+        'История задаёт предварительную оценку, а решение уточняется по пилотам.</p>',
         unsafe_allow_html=True,
     )
     st.markdown(_audience_chart_html(overview), unsafe_allow_html=True)
@@ -998,14 +1097,19 @@ progress_slot.markdown(
     ),
     unsafe_allow_html=True,
 )
+ai_info = st.session_state.get("current_ai")
+if ai_info is not None:
+    ai_slot.markdown(_ai_panel_html(ai_info), unsafe_allow_html=True)
 
 st.markdown("### От данных к решению")
 st.markdown(_decision_flow_html(result), unsafe_allow_html=True)
 
 st.markdown("### Рекомендованный портфель кампаний")
 st.markdown(
-    '<p class="section-intro">Финальный план построен в пределах выбранного бюджета. '
-    'Прогноз агента относится к финальным кампаниям и не включает эффект пилотов.</p>',
+    '<p class="section-intro">Это предложения агента по текущей синтетической базе: '
+    'кого охватить, какой тариф предложить и через какой канал. '
+    'Прогноз оценивает только финальные кампании после их стоимости; '
+    'затраты и эффект пилотов в него не входят.</p>',
     unsafe_allow_html=True,
 )
 with st.container(border=True):
@@ -1014,6 +1118,12 @@ with st.container(border=True):
 previous = st.session_state.get("previous_scenario")
 if previous is not None and previous["totals"]["budget"] != result["totals"]["budget"]:
     st.markdown("### Сценарный анализ")
+    st.markdown(
+        '<p class="section-intro">Сравнение двух запусков на одной базе: '
+        'при новом бюджете агент заново проводит пилоты и выбирает кампании. '
+        'Так видно, меняются ли план и расходы вместе с лимитом.</p>',
+        unsafe_allow_html=True,
+    )
     st.markdown(_scenario_comparison_html(previous, result), unsafe_allow_html=True)
 
 st.markdown(
@@ -1093,22 +1203,28 @@ with st.container(border=True):
     st.markdown(
         f'<div class="portfolio-strip">'
         f'<div class="strip-item"><div class="strip-label">Чистый прирост в тестовой среде</div>'
-        f'<div class="strip-value">{_text(_money(mock["net_arpu_gain"], signed=True))}</div></div>'
+        f'<div class="strip-value">{_text(_money(mock["net_arpu_gain"], signed=True))}</div>'
+        '<div class="strip-help">Локальный расчёт · эффект по уникальным абонентам минус стоимость всех контактов</div></div>'
         f'<div class="strip-item"><div class="strip-label">Контактов с учётом пилотов</div>'
-        f'<div class="strip-value">{_number(mock["total_contacts"])}</div></div>'
+        f'<div class="strip-value">{_number(mock["total_contacts"])}</div>'
+        '<div class="strip-help">Все пилотные и финальные обращения расходуют лимит</div></div>'
         f'<div class="strip-item"><div class="strip-label">Затраты на все контакты</div>'
-        f'<div class="strip-value">{_text(_money(mock["total_cost"]))}</div></div>'
+        f'<div class="strip-value">{_text(_money(mock["total_cost"]))}</div>'
+        '<div class="strip-help">Число обращений × цена каждого канала</div></div>'
         f'<div class="strip-item"><div class="strip-label">Уникальных адресатов</div>'
-        f'<div class="strip-value">{_number(mock["unique_customers_targeted"])}</div></div>'
+        f'<div class="strip-value">{_number(mock["unique_customers_targeted"])}</div>'
+        '<div class="strip-help">Повторные обращения не умножают эффект</div></div>'
         "</div>"
-        '<div class="evidence-note">Это результат официального скорера на локальной мок-модели '
-        'после завершения работы агента. Скрытые эффекты судейской среды неизвестны; '
-        'число выше не является прогнозом конкурсного результата.</div>',
+        '<div class="evidence-note">Проверка выполнена по правилам кейса на локальной '
+        'тестовой модели после завершения работы агента. Здесь учтены пилоты и '
+        'финальные кампании. Эффекты скрытого зачёта неизвестны; эти числа не '
+        'являются прогнозом конкурсного результата.</div>',
         unsafe_allow_html=True,
     )
 
 st.markdown(
     '<div class="evidence-note" style="margin-top:20px">Все данные в этом интерфейсе синтетические. '
-    'Сервис не отправляет кампании абонентам и не использует внешние AI-сервисы.</div>',
+    'Сервис не отправляет кампании абонентам; OpenAI получает только обезличенные '
+    'сводки локального анализа.</div>',
     unsafe_allow_html=True,
 )

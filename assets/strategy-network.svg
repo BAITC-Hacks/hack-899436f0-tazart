@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360" role="img" aria-labelledby="title desc">
+  <title id="title">Путь от сегментов аудитории к оптимальному плану кампаний</title>
+  <desc id="desc">Абстрактная схема: группы аудитории сходятся в аналитическом ядре и расходятся к трём кампаниям.</desc>
+  <defs>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e1bd27" stop-opacity=".55"/>
+      <stop offset=".52" stop-color="#f8d335"/>
+      <stop offset="1" stop-color="#fff1a0" stop-opacity=".72"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#343729"/>
+      <stop offset="1" stop-color="#1c1f20"/>
+    </linearGradient>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#f8d335" opacity=".16"/>
+    </pattern>
+  </defs>
+
+  <rect x="9" y="10" width="542" height="340" rx="28" fill="url(#dots)"/>
+  <path d="M35 180H525M280 27V333" stroke="#fff" stroke-opacity=".065" stroke-dasharray="3 9"/>
+  <circle cx="280" cy="180" r="134" fill="none" stroke="#f8d335" stroke-opacity=".10"/>
+  <circle cx="280" cy="180" r="103" fill="none" stroke="#fff" stroke-opacity=".08" stroke-dasharray="2 10"/>
+
+  <g fill="none" stroke="url(#signal)" stroke-width="2" stroke-linecap="round">
+    <path d="M133 83C202 83 190 143 226 160"/>
+    <path d="M133 180H215"/>
+    <path d="M133 277C202 277 190 217 226 200"/>
+    <path d="M334 160C370 143 358 83 427 83"/>
+    <path d="M345 180H427"/>
+    <path d="M334 200C370 217 358 277 427 277"/>
+  </g>
+  <g fill="#f8d335">
+    <circle cx="190" cy="127" r="3"/><circle cx="186" cy="180" r="3"/><circle cx="190" cy="233" r="3"/>
+    <circle cx="370" cy="127" r="3"/><circle cx="374" cy="180" r="3"/><circle cx="370" cy="233" r="3"/>
+  </g>
+
+  <g fill="#232628" stroke="#fff" stroke-opacity=".16">
+    <rect x="22" y="54" width="111" height="58" rx="15"/>
+    <rect x="22" y="151" width="111" height="58" rx="15"/>
+    <rect x="22" y="248" width="111" height="58" rx="15"/>
+    <rect x="427" y="54" width="111" height="58" rx="15"/>
+    <rect x="427" y="151" width="111" height="58" rx="15"/>
+    <rect x="427" y="248" width="111" height="58" rx="15"/>
+  </g>
+
+  <g fill="none" stroke="#f8d335" stroke-width="2">
+    <circle cx="49" cy="83" r="9"/><circle cx="49" cy="180" r="9"/><circle cx="49" cy="277" r="9"/>
+  </g>
+  <g fill="#f8d335">
+    <circle cx="49" cy="81" r="3"/><circle cx="49" cy="178" r="3"/><circle cx="49" cy="275" r="3"/>
+  </g>
+  <g fill="#d9dcd7" opacity=".92">
+    <rect x="68" y="73" width="43" height="5" rx="2.5"/><rect x="68" y="86" width="30" height="4" rx="2" opacity=".42"/>
+    <rect x="68" y="170" width="36" height="5" rx="2.5"/><rect x="68" y="183" width="43" height="4" rx="2" opacity=".42"/>
+    <rect x="68" y="267" width="45" height="5" rx="2.5"/><rect x="68" y="280" width="25" height="4" rx="2" opacity=".42"/>
+  </g>
+
+  <circle cx="280" cy="180" r="64" fill="url(#core)" stroke="#f8d335" stroke-width="1.5"/>
+  <circle cx="280" cy="180" r="53" fill="none" stroke="#f8d335" stroke-opacity=".24" stroke-dasharray="3 7"/>
+  <g stroke="#f8d335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M251 190L269 164L291 176L307 154M269 164L274 201L302 207M291 176L302 207"/>
+    <path d="M306 153l-7 2 6 5"/>
+  </g>
+  <g fill="#f8d335">
+    <circle cx="251" cy="190" r="4"/><circle cx="269" cy="164" r="5"/>
+    <circle cx="291" cy="176" r="5"/><circle cx="307" cy="154" r="5"/>
+    <circle cx="274" cy="201" r="4"/><circle cx="302" cy="207" r="5"/>
+  </g>
+
+  <g fill="#f8d335">
+    <rect x="449" y="83" width="9" height="13" rx="2" opacity=".45"/><rect x="465" y="72" width="9" height="24" rx="2" opacity=".7"/><rect x="481" y="64" width="9" height="32" rx="2"/>
+    <rect x="449" y="180" width="9" height="13" rx="2" opacity=".45"/><rect x="465" y="169" width="9" height="24" rx="2" opacity=".7"/><rect x="481" y="161" width="9" height="32" rx="2"/>
+    <rect x="449" y="277" width="9" height="13" rx="2" opacity=".45"/><rect x="465" y="266" width="9" height="24" rx="2" opacity=".7"/><rect x="481" y="258" width="9" height="32" rx="2"/>
+  </g>
+  <g stroke="#fff" stroke-opacity=".48" stroke-width="1.5" stroke-linecap="round">
+    <path d="M449 98h63M449 195h63M449 292h63"/>
+  </g>
+</svg>
