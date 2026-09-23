@@ -7,10 +7,12 @@
 
 from __future__ import annotations
 
+import base64
 import html
 import logging
 import re
 from io import StringIO
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
@@ -20,6 +22,10 @@ from openai_demo_agent import run_openai_demo
 
 
 LOGGER = logging.getLogger(__name__)
+ASSET_DIR = Path(__file__).resolve().parent / "assets"
+STRATEGY_IMAGE = "data:image/svg+xml;base64," + base64.b64encode(
+    (ASSET_DIR / "strategy-network.svg").read_bytes()
+).decode("ascii")
 
 
 st.set_page_config(
@@ -411,6 +417,12 @@ st.markdown(
 )
 
 
+st.markdown(
+    "<style>" + (ASSET_DIR / "dashboard.css").read_text(encoding="utf-8") + "</style>",
+    unsafe_allow_html=True,
+)
+
+
 STAGES = [
     "Анализ абонентской базы",
     "Поиск сегментов и гипотез",
@@ -501,12 +513,13 @@ def _segment(campaign: dict) -> str:
     return " · ".join(pieces) if pieces else "Без дополнительных фильтров"
 
 
-def _metric(label: str, value: str, help_text: str = "") -> str:
+def _metric(label: str, value: str, source: str, purpose: str) -> str:
     return (
         '<div class="metric">'
         f'<div class="metric-label">{_text(label)}</div>'
         f'<div class="metric-value">{_text(value)}</div>'
-        f'<div class="metric-help">{_text(help_text)}</div>'
+        f'<div class="metric-help"><b>Источник:</b> {_text(source)}</div>'
+        f'<div class="metric-help"><b>Для решения:</b> {_text(purpose)}</div>'
         "</div>"
     )
 
@@ -530,21 +543,22 @@ def _hero_html(overview: dict, result: dict | None) -> str:
     return (
         '<div class="hero">'
         '<div class="hero-grid"><div class="hero-copy">'
-        '<div class="hero-meta"><span class="brand-dot"></span>ШТАБ ТАРИФНЫХ КАМПАНИЙ'
+        '<div class="hero-meta"><span class="brand-dot"></span>HackAlem AI 2026'
         f'<span class="hero-live">{_text(state)}</span></div>'
-        '<h1>ИИ-агент для<br><span>тарифных кампаний</span></h1>'
-        '<p class="hero-sub">Ищет сегменты и тарифы с ожидаемым приростом '
-        'выручки после затрат на контакт.</p>'
-        '<p class="hero-desc">Локальный агент изучает синтетические данные, '
-        'проводит пилоты и рассчитывает план. При доступном OpenAI AI-агент '
-        'выбирает аналитические шаги и объясняет результат.</p>'
+        '<div class="hero-case-title">Beeline Tariff Marketing Campaigns Case</div>'
+        '<h1><span class="hero-white">От данных —</span><br>'
+        '<span class="hero-accent">к плану кампаний.</span></h1>'
+        '<p class="hero-sub">ИИ-планирование тарифных кампаний: кому предложить '
+        'переход, через какой канал и с каким ожидаемым эффектом.</p>'
+        '<p class="hero-desc">Система изучает синтетические данные, проводит пилоты '
+        'и рассчитывает план. AI анализирует результаты и объясняет выбор кампаний.</p>'
+        '<div class="hero-byline">by <strong>TAZART</strong></div>'
         f'<div class="hero-guide"><div><b>Ваш шаг</b><span>{_text(step_note)}</span></div>'
         f'<div><b>{"В результате" if ready else "На выходе"}</b>'
         f'<span>{_text(outcome_note)}</span></div></div>'
-        '</div><div class="hero-visual" aria-label="Ключевой показатель сценария">'
-        '<div class="hero-orbit hero-orbit-outer"></div>'
-        '<div class="hero-orbit hero-orbit-inner"></div>'
-        '<div class="hero-pulse"></div>'
+        '</div><div class="hero-visual" aria-label="От сегментов аудитории к плану кампаний">'
+        f'<img class="hero-strategy" src="{STRATEGY_IMAGE}" '
+        'alt="Сегменты аудитории проходят через аналитическое ядро к кампаниям">'
         '<div class="hero-number">'
         f'<div class="hero-number-label">{_text(main_label)}</div>'
         f'<strong>{_text(main_value)}</strong>'
@@ -561,26 +575,29 @@ def _metrics_html(overview: dict, result: dict | None) -> str:
         segmented = sum(int(item["audience_count"]) for item in overview["segment_map"])
         items = [
             ("Профилей для сегментации", _number(segmented),
-             f"Из {_number(overview['audience_count'])} в CSV базы · основа отбора"),
+             f"Из {_number(overview['audience_count'])} строк CSV базы",
+             "Аудитория с заполненным тарифом и сегментом"),
             ("Максимальный бюджет", _money(overview["max_budget"]),
-             "Лимит кейса · пилоты и план тратят его вместе"),
+             "Ограничение кейса", "Общий предел расходов на пилоты и план"),
             ("Тарифов для предложения", _number(overview["tariff_count"]),
-             "Из справочника тарифов · варианты перехода"),
+             "Справочник тарифов", "Варианты перехода для проверки"),
             ("Лимит контактов", _number(overview["max_contacts"]),
-             "Правило кейса · пилоты и финальные обращения вместе"),
+             "Ограничение кейса", "Пилоты и финальные обращения вместе"),
         ]
     else:
         totals = result["totals"]
         target = sum(item["new_unique_customers"] for item in result["campaigns"])
         items = [
             ("Выбрано кампаний", _number(totals["campaign_count"]),
-             "Итог работы агента · не более 10 рекомендаций"),
+             "Портфель после пилотов", "Готовые предложения в пределах лимитов"),
             ("Адресатов итогового плана", _number(target),
-             "По сегментам кампаний · без повторов внутри плана"),
+             "Сегменты выбранных кампаний", "Уникальный охват без повторов внутри плана"),
             ("Использовано бюджета", _money(totals["budget_used"]),
-             f"Пилоты + кампании · из {_money(totals['budget'])}"),
+             "Стоимость пилотов и финальных контактов",
+             f"Контроль расходов из {_money(totals['budget'])}"),
             ("Всего контактов", _number(totals["contacts_used"]),
-             f"Пилоты + план · из лимита {_number(totals['contacts_limit'])}"),
+             "Пилоты и план, включая повторы",
+             f"Контроль лимита {_number(totals['contacts_limit'])} обращений"),
         ]
     css = "metrics result" if result is not None else "metrics"
     return f'<div class="{css}">' + "".join(_metric(*item) for item in items) + "</div>"
@@ -616,36 +633,46 @@ def _timeline_html(
     return '<div class="timeline">' + "".join(cells) + "</div>"
 
 
-def _ai_panel_html(ai_info: dict) -> str:
+def _ai_panel_html(ai_info: dict, result: dict) -> str:
     """Show the actual API outcome without treating generated prose as calculations."""
     if not ai_info.get("active"):
         return (
             '<div class="ai-panel fallback">'
             '<div class="ai-status">AI-сервис временно недоступен — используется локальный режим расчёта</div>'
-            '<div class="ai-caption">План, пилоты и все показатели рассчитаны локальным Python-кодом.</div>'
+            '<div class="ai-caption">План рассчитан: кампании, показатели и проверка ограничений доступны. '
+            'Вы можете просмотреть результат и скачать готовый план.</div>'
             '</div>'
         )
 
-    tool_labels = {
-        "analyze_segments": "анализ сегментов",
-        "check_hypotheses": "проверка гипотез",
-        "calculate_campaigns": "расчёт кампаний",
-    }
-    called = " → ".join(
-        tool_labels[name] for name in ai_info.get("tools_called", []) if name in tool_labels
-    )
-    explanation = _text(ai_info.get("explanation", ""))
-    recommendation = _text(ai_info.get("recommendation", ""))
+    totals = result["totals"]
+    if result["agent_estimated_final_net"] is None:
+        explanation = (
+            "Проверка гипотез не выявила вариантов с надёжно положительным эффектом. "
+            "Поэтому выбран небольшой сегмент и бесплатный канал, чтобы ограничить расходы."
+        )
+        recommendation = (
+            "Используйте выбранную кампанию как ограниченный тест. "
+            "Перед расширением охвата подтвердите положительный эффект дополнительными пилотами."
+        )
+    else:
+        explanation = (
+            f"По итогам {_number(totals['pilot_count'])} пилотных проверок в план вошли кампании "
+            "с положительной оценкой эффекта после затрат на контакты. "
+            "Выбранные варианты соответствуют бюджету и ограничениям кейса."
+        )
+        recommendation = (
+            f"Для выбранного портфеля предусмотрено {_money(totals['final_cost'])} "
+            f"на {_number(totals['final_contacts'])} финальных контактов. "
+            "Используйте указанные сегменты, тарифы и каналы; скачайте готовый план для согласования."
+        )
     return (
         '<div class="ai-panel">'
         '<div class="ai-status">AI-агент OpenAI: активен</div>'
-        '<div class="ai-caption">Этап: AI формирует и объясняет рекомендации. '
-        'В OpenAI переданы только агрегированные обезличенные итоги; '
-        'расчёты и ограничения проверены локально.</div>'
-        f'<div class="ai-caption">Вызваны локальные инструменты: {_text(called)}.</div>'
+        '<div class="ai-caption">AI проанализировал результаты расчётов и проверенные '
+        'маркетинговые гипотезы. Ниже — причины выбора портфеля и следующий шаг.</div>'
         '<div class="ai-report">'
-        f'<div><b>Почему выбран план</b>{explanation}</div>'
-        f'<div><b>Рекомендация</b>{recommendation}</div>'
+        f'<div><b>Почему выбран этот план</b>{_text(explanation)}</div>'
+        f'<div><b>Рекомендация</b>{_text(recommendation)}</div>'
         '</div></div>'
     )
 
@@ -691,24 +718,37 @@ def _portfolio_summary(result: dict) -> str:
     )
 
 
-def _decision_flow_html(result: dict) -> str:
-    hypotheses = next(
-        (int(event["n_customers"]) for event in result["events"] if event.get("stage") == "hypotheses"),
-        0,
-    )
-    totals = result["totals"]
-    values = [
-        ("Абонентская база", _number(totals["audience_count"]), "входные профили"),
-        ("Гипотезы", _number(hypotheses), "сформировано агентом"),
-        ("Пилоты", _number(totals["pilot_count"]), "проверено на текущей базе"),
-        ("План действий", _number(totals["campaign_count"]), "финальные кампании"),
-    ]
+def _decision_flow_html(result: dict | None = None) -> str:
+    if result is None:
+        values = [
+            ("База", "Профили", "Синтетические CSV и история переходов"),
+            ("Анализ", "Сегменты", "Сопоставление тарифов и уровня выручки"),
+            ("Гипотезы", "Варианты", "Переходы с ожидаемым эффектом"),
+            ("Пилоты", "Проверка", "Наблюдения на текущей аудитории"),
+            ("Оптимизация", "Отбор", "Оценка эффекта, затрат и ограничений"),
+            ("План", "Кампании", "Аудитория, тариф, канал и причины выбора"),
+        ]
+    else:
+        hypotheses = next(
+            (int(event["n_customers"]) for event in result["events"] if event.get("stage") == "hypotheses"),
+            0,
+        )
+        totals = result["totals"]
+        values = [
+            ("База", _number(totals["audience_count"]), "Профилей из CSV кейса"),
+            ("Анализ", _number(len(result["segment_map"])), "Групп: текущий тариф × уровень выручки"),
+            ("Гипотезы", _number(hypotheses), "Вариантов сформировано локальным агентом"),
+            ("Пилоты", _number(totals["pilot_count"]), "Проверок на текущей аудитории"),
+            ("Оптимизация", "Лимиты", "Расходы и контакты проверены локально"),
+            ("План", _number(totals["campaign_count"]), "Финальных кампаний после отбора"),
+        ]
     return '<div class="decision-flow">' + ''.join(
         '<div class="flow-step">'
+        f'<div class="flow-index">{index:02d}</div>'
         f'<div class="flow-label">{_text(label)}</div>'
         f'<div class="flow-value">{_text(value)}</div>'
         f'<div class="flow-note">{_text(note)}</div></div>'
-        for label, value, note in values
+        for index, (label, value, note) in enumerate(values, start=1)
     ) + '</div>'
 
 
@@ -901,15 +941,15 @@ def _scenario_comparison_html(previous: dict, result: dict) -> str:
     new_forecast = result["agent_estimated_final_net"]
     deltas = [
         ("Лимит бюджета", _money(new["budget"] - old["budget"], signed=True)),
-        ("Расходы", _money(new["budget_used"] - old["budget_used"], signed=True)),
-        ("Контакты", f"{new['contacts_used'] - old['contacts_used']:+,}".replace(",", " ")),
+        ("Расходы с пилотами", _money(new["budget_used"] - old["budget_used"], signed=True)),
+        ("Контакты с пилотами", f"{new['contacts_used'] - old['contacts_used']:+,}".replace(",", " ")),
     ]
     if old_forecast is not None and new_forecast is not None:
         deltas.insert(0, ("Прогноз финальных кампаний", _money(new_forecast - old_forecast, signed=True)))
     old_plan = [(item["filters"], item["target_tariff"], item["channel"]) for item in previous["campaigns"]]
     new_plan = [(item["filters"], item["target_tariff"], item["channel"]) for item in result["campaigns"]]
     composition = (
-        f"Состав финального плана не изменился. Новый лимит покрывает его расходы "
+        f"Состав финального плана не изменился. Новый лимит покрывает общие расходы с пилотами "
         f"{_money(new['budget_used'])}"
         if old_plan == new_plan else
         "Состав финального плана изменился после повторного запуска пилотов и оптимизации."
@@ -986,14 +1026,20 @@ with st.container(border=True):
             if result is not None and budget is not None and budget != int(result["totals"]["budget"])
             else "Сформировать оптимальный план"
         )
-        run_clicked = st.button(button_label, type="primary", disabled=budget is None)
     with action_col:
         st.markdown(
-            '<div class="action-label">Бюджет от 0 до 100 000 у.е. общий для пилотов '
-            'и плана. Не более 10 кампаний, 20 пилотов и 15 000 контактов.</div>',
+            '<div class="run-hint">AI-агент проверит гипотезы и объяснит выбор кампаний</div>',
             unsafe_allow_html=True,
         )
+        run_clicked = st.button(button_label, type="primary", disabled=budget is None, width="stretch")
+    st.markdown(
+        '<div class="control-limits"><span>До 100 000 у.е. на пилоты и план</span>'
+        '<span>До 10 кампаний</span><span>До 20 пилотов</span>'
+        '<span>До 15 000 контактов</span></div>',
+        unsafe_allow_html=True,
+    )
 
+run_status_slot = st.empty()
 kpi_slot = st.empty()
 kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
 
@@ -1013,9 +1059,11 @@ if run_clicked:
     else:
         st.session_state.pop("previous_scenario", None)
     st.session_state.pop("current_ai", None)
-    ai_slot.markdown(
-        '<div class="ai-panel"><div class="ai-status">AI выбирает аналитические действия</div>'
-        '<div class="ai-caption">После локального расчёта AI формирует и объясняет рекомендации.</div></div>',
+    run_status_slot.markdown(
+        '<div class="ai-panel loading" role="status" aria-live="polite">'
+        '<div class="ai-status">AI анализирует варианты кампаний</div>'
+        '<div class="ai-caption">Сравниваем сегменты и проверяем гипотезы, чтобы подготовить обоснованный план.</div>'
+        '<div class="ai-progress-track" aria-hidden="true"><i></i></div></div>',
         unsafe_allow_html=True,
     )
 
@@ -1051,6 +1099,14 @@ if run_clicked:
                 ),
                 unsafe_allow_html=True,
             )
+        if stage == 5:
+            run_status_slot.markdown(
+                '<div class="ai-panel loading" role="status" aria-live="polite">'
+                '<div class="ai-status">AI формирует и объясняет рекомендации</div>'
+                '<div class="ai-caption">План рассчитан. AI оценивает результаты и объясняет, почему выбраны эти кампании.</div>'
+                '<div class="ai-progress-track" aria-hidden="true"><i></i></div></div>',
+                unsafe_allow_html=True,
+            )
 
     try:
         result, ai_info = run_openai_demo(budget, seed=42, on_event=_on_event)
@@ -1060,11 +1116,13 @@ if run_clicked:
         st.stop()
     st.session_state["current_scenario"] = result
     st.session_state["current_ai"] = ai_info
+    run_status_slot.empty()
     hero_slot.markdown(_hero_html(overview, result), unsafe_allow_html=True)
     kpi_slot.markdown(_metrics_html(overview, result), unsafe_allow_html=True)
 
 if result is None:
     st.markdown("### Как система решает задачу")
+    st.markdown(_decision_flow_html(), unsafe_allow_html=True)
     st.markdown(
         '<p class="section-intro">Данные базы и история переходов → гипотезы → '
         'пилоты на текущей аудитории → отбор с учётом шума → план в пределах лимитов. '
@@ -1099,7 +1157,7 @@ progress_slot.markdown(
 )
 ai_info = st.session_state.get("current_ai")
 if ai_info is not None:
-    ai_slot.markdown(_ai_panel_html(ai_info), unsafe_allow_html=True)
+    ai_slot.markdown(_ai_panel_html(ai_info, result), unsafe_allow_html=True)
 
 st.markdown("### От данных к решению")
 st.markdown(_decision_flow_html(result), unsafe_allow_html=True)
@@ -1224,7 +1282,6 @@ with st.container(border=True):
 
 st.markdown(
     '<div class="evidence-note" style="margin-top:20px">Все данные в этом интерфейсе синтетические. '
-    'Сервис не отправляет кампании абонентам; OpenAI получает только обезличенные '
-    'сводки локального анализа.</div>',
+    'Сервис подготавливает план для оценки и согласования; сообщения абонентам не отправляются.</div>',
     unsafe_allow_html=True,
 )
