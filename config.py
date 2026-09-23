@@ -36,8 +36,10 @@ def require_api_key(provider: str) -> str:
         name = _KEY_NAMES[provider.lower()]
     except KeyError as exc:
         raise ValueError("provider must be 'openai' or 'nvidia'") from exc
-    load_local_env()
     key = os.environ.get(name)
+    if key is None:
+        load_local_env()
+        key = os.environ.get(name)
     if not key:
         raise RuntimeError(f"{name} is missing; set it in the environment or local .env")
     return key

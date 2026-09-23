@@ -633,7 +633,7 @@ def _timeline_html(
     return '<div class="timeline">' + "".join(cells) + "</div>"
 
 
-def _ai_panel_html(ai_info: dict, result: dict) -> str:
+def _ai_panel_html(ai_info: dict) -> str:
     """Show the actual API outcome without treating generated prose as calculations."""
     if not ai_info.get("active"):
         return (
@@ -644,27 +644,8 @@ def _ai_panel_html(ai_info: dict, result: dict) -> str:
             '</div>'
         )
 
-    totals = result["totals"]
-    if result["agent_estimated_final_net"] is None:
-        explanation = (
-            "Проверка гипотез не выявила вариантов с надёжно положительным эффектом. "
-            "Поэтому выбран небольшой сегмент и бесплатный канал, чтобы ограничить расходы."
-        )
-        recommendation = (
-            "Используйте выбранную кампанию как ограниченный тест. "
-            "Перед расширением охвата подтвердите положительный эффект дополнительными пилотами."
-        )
-    else:
-        explanation = (
-            f"По итогам {_number(totals['pilot_count'])} пилотных проверок в план вошли кампании "
-            "с положительной оценкой эффекта после затрат на контакты. "
-            "Выбранные варианты соответствуют бюджету и ограничениям кейса."
-        )
-        recommendation = (
-            f"Для выбранного портфеля предусмотрено {_money(totals['final_cost'])} "
-            f"на {_number(totals['final_contacts'])} финальных контактов. "
-            "Используйте указанные сегменты, тарифы и каналы; скачайте готовый план для согласования."
-        )
+    explanation = ai_info["explanation"]
+    recommendation = ai_info["recommendation"]
     return (
         '<div class="ai-panel">'
         '<div class="ai-status">AI-агент OpenAI: активен</div>'
@@ -1157,7 +1138,7 @@ progress_slot.markdown(
 )
 ai_info = st.session_state.get("current_ai")
 if ai_info is not None:
-    ai_slot.markdown(_ai_panel_html(ai_info, result), unsafe_allow_html=True)
+    ai_slot.markdown(_ai_panel_html(ai_info), unsafe_allow_html=True)
 
 st.markdown("### От данных к решению")
 st.markdown(_decision_flow_html(result), unsafe_allow_html=True)

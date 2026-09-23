@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import io
+import html
 import json
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 from urllib.error import URLError
 
@@ -69,6 +71,43 @@ def _api_response(body: dict, index: int) -> dict:
 
 
 class OpenAIDemoAgentTest(unittest.TestCase):
+    def test_main_button_displays_actual_ai_response(self) -> None:
+        from streamlit.testing.v1 import AppTest
+
+        submitted: list[dict] = []
+        explanation = "Выбор модели: сегменты <проверены>, бюджет учтён."
+        recommendation = "Рекомендация модели: согласуйте выбранные кампании."
+
+        def fake_urlopen(request, timeout):
+            body = json.loads(request.data)
+            response = _api_response(body, len(submitted))
+            submitted.append(body)
+            if len(submitted) == 4:
+                response["output"][0]["content"][0]["text"] = json.dumps({
+                    "explanation": explanation,
+                    "recommendation": recommendation,
+                }, ensure_ascii=False)
+            return io.BytesIO(json.dumps(response).encode("utf-8"))
+
+        with (
+            patch("openai_demo_agent.require_api_key", return_value="test-key"),
+            patch("openai_demo_agent.urlopen", side_effect=fake_urlopen),
+        ):
+            app = AppTest.from_file(str(Path(__file__).with_name("app.py"))).run(timeout=30)
+            self.assertEqual(len(submitted), 0)
+            next(button for button in app.button
+                 if button.label == "Сформировать оптимальный план").click().run(timeout=30)
+
+        self.assertEqual(len(app.exception), 0)
+        self.assertEqual(len(app.error), 0)
+        self.assertEqual(len(submitted), 4)
+        self.assertTrue(app.session_state["current_ai"]["active"])
+        panel = next(item.value for item in app.markdown
+                     if 'class="ai-report"' in item.value)
+        self.assertIn(html.escape(explanation), panel)
+        self.assertIn(html.escape(recommendation), panel)
+        self.assertNotIn("<проверены>", panel)
+
     def test_real_tool_protocol_only_sends_aggregates(self) -> None:
         local = _local_result()
         submitted: list[dict] = []
