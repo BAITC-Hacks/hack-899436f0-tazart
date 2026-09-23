@@ -1,0 +1,13 @@
+# Local API credentials. Keep the example file in Git.
+.env
+.env.*
+!.env.example
+
+# Python and local development files.
+__pycache__/
+*.py[cod]
+.venv/
+
+# Streamlit secrets, if a dashboard is added later.
+.streamlit/secrets.toml
+.DS_Store
